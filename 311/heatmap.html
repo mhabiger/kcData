@@ -6,37 +6,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 
-    <!-- Fonts -->
-    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+<link href="http://cdnjs.cloudflare.com/ajax/libs/foundation/5.2.3/css/foundation.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.2.3/js/vendor/modernizr.js"></script>
+<link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/noUiSlider/6.2.0/jquery.nouislider.min.css">
+
 	<style type="text/css">
-#map {
-    width: 100%;
-    height: 500px;
-    margin-top: 20px;
-    margin-bottom: 100px;
-}
+      #map {
+          width: 100%;
+          height: 500px;
+          margin-top: 20px;
+          margin-bottom: 100px;
+      }
+      .noUi-target {border: 1px solid #330000}
+
 	</style>
 
 </head>
 
 <body>
-<section class="container content-section text-center">
-<h2>KCMO Water Call Map</h2>
-	<h4 id="yrmth">Data for 200701</h4>
-    <div id="map" ></div>
-</section>
+   <section class="container  text-center">
+      <h2>KCMO Water Call Map</h2>
+      	<h4 id="yrmth">Data for 200701</h4>
+         <div class="row">
+      	     <button onclick="play()">Play Heatmap</button>
+                <div class="slider" ></div>
+         </div>
+   </section>
+ 
+
+         <div id="map" ></div>
+
+
 
 <!-- Core JavaScript Files -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.2.3/js/vendor/fastclick.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/6.2.0/jquery.nouislider.min.js"></script>
+
 <!-- Google Maps API Key - You will need to use your own API key to use the map feature -->
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYImlZa-JUmREeeZ-5Y2Falmbmk2aor-U&sensor=false&libraries=visualization"></script>
 
+
+
+
+</body>
+
 <script type="text/javascript">
+
+
 var map, pointarray, heatmap;
 
 var Data = [[200701,
@@ -65929,9 +65948,9 @@ function initialize() {
 //google.maps.event.addListener(heatmapData);
 
 function updateData(m) {  
-	var newmapData = []
-	var taxi = Data[m][1];
-	for (var i = 0; i < taxi.length; i++) {
+   var newmapData = []
+   var taxi = Data[m][1];
+   for (var i = 0; i < taxi.length; i++) {
     var latLng = new google.maps.LatLng(taxi[i][0], taxi[i][1]);
     var magnitude = taxi[i][2];
     var weightedLoc = {
@@ -65947,16 +65966,36 @@ function updateData(m) {
 
 }
 
-for (i=1;i<Data.length;i++){setTimeout(updateData,2000*(i+1),i)};
+// Function for playing the heatmap
+
+function play() {for (i=1;i<Data.length;i++)
+      {setTimeout(updateData,1000*(i+1),i)};};
+
+
+// Function for controlling the heatmap with slider
+$(function slide(){
+$('.slider').noUiSlider({
+   start: 0,
+   step:1,
+   range: {
+      'min': 0,
+      'max': Data.length
+   },
+   serialization:{
+      lower:[
+         $.Link({ target: updateData})],
+   format:{decimals:0}
+   }
+});});
+
 
 // End of code for updating map
 
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
+
+
     </script>
-
-
-</body>
 
 </html>
