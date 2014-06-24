@@ -11,7 +11,7 @@ from pylab import *
 
 d = pd.read_csv('data/311data', nrows=1000) #limit to 1k rows for testing
 d = pd.DataFrame(d,columns=['creation_date', 'closed_date', 'latitude', 'longitude', 'request_type'])
-d.sort(columns=['closed_date'], ascending=True, inplace=True)
+#d.sort(columns=['closed_date'], ascending=True, inplace=True)
 
 #-1 is the value that find returns if it doesn't find the string
 #Filter the Dataset. Remove all rows without 'Water' in their request_type
@@ -19,7 +19,7 @@ data = pd.DataFrame
 i = 0
 for index, row in d.iterrows():
      if(\
-       ( row['request_type'].find('Water') != -1 ) and\
+       ( str.upper(row['request_type']).find('WATER') != -1 ) and\
        ( row['longitude']  !=0 ) and\
        ( row['latitude' ]  !=0 ) ):            
             row_frame = pd.DataFrame([{'creation_date':row.creation_date,'closed_date':row.closed_date, 'longitude':row.longitude, 'latitude':row.latitude,'request_type':row.request_type }])
@@ -29,19 +29,25 @@ for index, row in d.iterrows():
             else: 
                 data = data.append(row_frame)
 
-#assumes the data is sorted by date
-#assumes a 'data' DataFrame with latitude and longitude columns
-#time is a percentage through the dataset
+del d #relax d's memory usage
+data.sort(columns=['closed_date'], ascending=True, inplace=True)
+#d=0 
+#data.sort_index(by='closed_date', inplace=True, ascending=True)
+
+#assumes the data is sorted by closed_date
+#assumes a 'data' DataFrame with latitude and longitude and closed_date columns
+#time is the percentage through the dataset
+#global is used because this function is called from an implicit plot function
 def getLatsAndLongsByTimePercentage(time, num_points = -12):
     global data
     if (num_points == -12): num_points = len(data) / math.sqrt(len(data))
     if (time > 1.0) or (time < 0.0): return 0
-    start_index = int( len(d) * time )
+    start_index = int( len(data) * time )
     stop_index  = int( start_index + num_points )
-    start_date = d.closed_date[start_index]
-    stop_date  = d.closed_date[stop_index]
-    lats = pd.DataFrame(d, columns=['latitude']).values[start_index : stop_index]
-    longs= pd.DataFrame(d, columns=['longitude']).values[start_index : stop_index]
+    start_date = pd.DataFrame(data, columns=['closed_date']).values[start_index]
+    stop_date  = pd.DataFrame(data, columns=['closed_date']).values[stop_index]
+    lats = pd.DataFrame(data, columns=['latitude']).values[start_index : stop_index]
+    longs= pd.DataFrame(data, columns=['longitude']).values[start_index : stop_index]
     return lats,longs,start_date,stop_date
 
 # HEATMAP from http://matplotlib.org/basemap/users/examples.html
